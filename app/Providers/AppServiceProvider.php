@@ -6,7 +6,9 @@ namespace App\Providers;
 
 use App\Contracts\AddressFormatterInterface;
 use App\Contracts\GeocoderInterface;
+use App\Contracts\RouteProviderInterface;
 use App\Services\GoogleGeocoder;
+use App\Services\GoogleRouteProvider;
 use App\Services\OpenAiAddressFormatter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
@@ -23,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(AddressFormatterInterface::class, OpenAiAddressFormatter::class);
         $this->app->bind(GeocoderInterface::class, GoogleGeocoder::class);
+        $this->app->bind(RouteProviderInterface::class, GoogleRouteProvider::class);
     }
 
     /**

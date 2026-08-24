@@ -40,6 +40,16 @@ class ImportRowResource extends JsonResource
                 'endGeocodedAddress',
                 fn ($address) => ['lat' => $address->latitude, 'lng' => $address->longitude],
             ),
+            'route_computation_status' => $this->resource->route_computation_status->value,
+            'route_computation_error' => $this->resource->route_computation_error,
+            'route' => $this->whenLoaded(
+                'route',
+                fn ($route) => $route === null ? null : [
+                    'distance_meters' => $route->distance_meters,
+                    'duration_seconds' => $route->duration_seconds,
+                    'polyline' => $route->polyline,
+                ],
+            ),
         ];
     }
 }

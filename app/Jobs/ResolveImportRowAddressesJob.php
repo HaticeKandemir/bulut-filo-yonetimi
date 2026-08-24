@@ -24,6 +24,15 @@ class ResolveImportRowAddressesJob implements ShouldQueue
             $service->resolveRow($this->importRow);
         } catch (RateLimitedException $e) {
             $this->release($e->retryAfterSeconds);
+
+            return;
         }
+
+        // Always dispatch — RouteComputationService itself decides
+        // Computed/Skipped/Failed (an address Failed/Skipped or missing one
+        // side must still flip route_computation_status away from its
+        // Pending default, otherwise the row looks stuck "processing"
+        // forever instead of reporting that no route will be computed).
+        ComputeImportRowRouteJob::dispatch($this->importRow);
     }
 }

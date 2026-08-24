@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\AddressResolutionStatus;
 use App\Enums\ImportRowStatus;
+use App\Enums\RouteComputationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'end_geocoded_address_id',
     'address_resolution_status',
     'address_resolution_error',
+    'route_id',
+    'route_computation_status',
+    'route_computation_error',
 ])]
 class ImportRow extends Model
 {
@@ -34,6 +38,7 @@ class ImportRow extends Model
             'raw_data' => 'array',
             'status' => ImportRowStatus::class,
             'address_resolution_status' => AddressResolutionStatus::class,
+            'route_computation_status' => RouteComputationStatus::class,
         ];
     }
 
@@ -65,5 +70,11 @@ class ImportRow extends Model
     public function endGeocodedAddress(): BelongsTo
     {
         return $this->belongsTo(GeocodedAddress::class, 'end_geocoded_address_id');
+    }
+
+    /** @return BelongsTo<Route, $this> */
+    public function route(): BelongsTo
+    {
+        return $this->belongsTo(Route::class);
     }
 }
