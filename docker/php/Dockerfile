@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         $PHPIZE_DEPS \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql bcmath zip intl opcache gd \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql bcmath zip intl opcache gd pcntl \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get purge -y --auto-remove $PHPIZE_DEPS \
