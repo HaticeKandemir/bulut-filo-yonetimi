@@ -232,3 +232,5 @@ yeniden hesaplanmaz.
 - İstenmediği sürece yeni paket kurma; önce gerekçesini söyle.
 - Kurum tablosuna CRUD ekleme; gereksinimde yok.
 - Bir görevi tamamlandı ilan etmeden önce ilgili komutu gerçekten çalıştır ve çıktısını göster.
+- Paketlerin API'sini ezberden yazma. Kurulu sürümün vendor klasöründeki
+  gerçek arayüzleri oku, sonra kod yaz.
