@@ -38,7 +38,13 @@ class ProcessVehicleImportJob implements ShouldQueue
         $this->importBatch->rows()
             ->where('status', ImportRowStatus::Pending)
             ->orderBy('row_number')
-            ->each(fn (ImportRow $row) => $service->processRow($row, $institutionCodeToId));
+            ->each(function (ImportRow $row) use ($service, $institutionCodeToId): void {
+                $service->processRow($row, $institutionCodeToId);
+
+                // Address resolution is independent of the VIN/plate outcome —
+                // a needs_review/failed row can still have a valid address.
+                ResolveImportRowAddressesJob::dispatch($row);
+            });
 
         $this->importBatch->update(['status' => ImportBatchStatus::Completed]);
     }

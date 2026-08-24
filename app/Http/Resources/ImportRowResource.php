@@ -30,6 +30,16 @@ class ImportRowResource extends JsonResource
                 'conflictingVehicle',
                 fn ($conflictingVehicle) => $conflictingVehicle->vin,
             ),
+            'address_resolution_status' => $this->resource->address_resolution_status->value,
+            'address_resolution_error' => $this->resource->address_resolution_error,
+            'start_coordinates' => $this->whenLoaded(
+                'startGeocodedAddress',
+                fn ($address) => ['lat' => $address->latitude, 'lng' => $address->longitude],
+            ),
+            'end_coordinates' => $this->whenLoaded(
+                'endGeocodedAddress',
+                fn ($address) => ['lat' => $address->latitude, 'lng' => $address->longitude],
+            ),
         ];
     }
 }

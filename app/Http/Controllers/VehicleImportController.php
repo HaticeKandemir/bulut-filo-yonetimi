@@ -39,7 +39,7 @@ class VehicleImportController extends Controller
     public function rows(Request $request, ImportBatch $importBatch): AnonymousResourceCollection
     {
         $rows = $importBatch->rows()
-            ->with('conflictingVehicle')
+            ->with(['conflictingVehicle', 'startGeocodedAddress', 'endGeocodedAddress'])
             ->when(
                 $request->query('status'),
                 fn ($query, $status) => $query->where('status', $status),
