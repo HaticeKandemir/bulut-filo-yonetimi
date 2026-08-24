@@ -13,7 +13,7 @@ Internship assessment project. Timeline: one sprint (10 working days). Single de
 
 ## Teknoloji yığını
 
-**Backend:** PHP 8.3, Laravel 11, MySQL 8, Redis (queue + cache), Laravel Horizon
+**Backend:** PHP 8.4, Laravel 13, MySQL 8, Redis (queue + cache), Laravel Horizon
 **Frontend:** React 19 + TypeScript + Vite, TanStack Query, TanStack Table, React Router,
 @vis.gl/react-google-maps, Tailwind CSS, react-hook-form + zod
 **Altyapı:** Docker Compose (php-fpm, nginx, mysql, redis, queue worker)
