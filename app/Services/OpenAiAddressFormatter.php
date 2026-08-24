@@ -89,8 +89,16 @@ final class OpenAiAddressFormatter implements AddressFormatterInterface
                 ])
                 ->throw();
         } catch (RequestException $e) {
-            if ($e->response->status() === 429) {
+            $status = $e->response->status();
+
+            if ($status === 429) {
                 throw RateLimitedException::upstreamOverQuota();
+            }
+
+            // A 5xx surviving retry() is still a transient upstream problem,
+            // not a permanent address-data problem — don't fail the row.
+            if ($status >= 500) {
+                throw RateLimitedException::upstreamTemporaryError();
             }
 
             throw AddressResolutionException::notResolvable($rawAddress);
