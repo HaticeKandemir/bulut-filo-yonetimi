@@ -19,6 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# PHPStan/Larastan analysis of the full app tree exceeds the 128M CLI default.
+RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/memory-limit.ini
+
 RUN groupadd -g 1000 appuser \
     && useradd -u 1000 -g appuser -m -s /bin/bash appuser
 
