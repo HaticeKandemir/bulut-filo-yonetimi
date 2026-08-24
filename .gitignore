@@ -1,0 +1,26 @@
+# Ortam değişkenleri
+.env
+.env.*
+!.env.example
+
+# Bağımlılıklar
+/vendor
+/node_modules
+
+# Laravel
+/storage/*.key
+/public/build
+/public/hot
+/public/storage
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Frontend build
+/dist
+*.tsbuildinfo
+
+# Araçlar
+.phpunit.result.cache
+/.idea
+/.vscode
+.DS_Store
