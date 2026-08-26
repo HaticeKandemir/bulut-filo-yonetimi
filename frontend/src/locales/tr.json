@@ -1,0 +1,13 @@
+{
+  "app": {
+    "title": "Bulut Filo Yönetimi"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu."
+  },
+  "home": {
+    "backendStatus": "Backend durumu",
+    "connected": "Bağlandı"
+  }
+}
