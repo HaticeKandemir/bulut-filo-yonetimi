@@ -13,7 +13,7 @@ installation is needed.
    `DB_DATABASE=bulut_filo_yonetimi`, `REDIS_HOST=redis`).
 
 2. Build the images and start all services. The `--build` flag is required on
-   the first run, otherwise the `queue` service (which reuses the `app` image)
+   the first run, otherwise the `horizon` service (which reuses the `app` image)
    fails with a `pull access denied` error:
 
    ```
@@ -36,7 +36,8 @@ docker compose exec app php artisan --version
 docker compose exec app php -m | grep -Ei 'pdo_mysql|redis|intl|gd|zip|bcmath|opcache'
 docker compose exec app php artisan tinker --execute="DB::connection()->getPdo(); echo 'DB OK';"
 docker compose exec app php artisan tinker --execute="Cache::store('redis')->put('healthcheck','ok',10); echo Cache::store('redis')->get('healthcheck');"
-docker compose logs queue --tail=50                         # should run without errors
+docker compose logs horizon --tail=50                       # should run without errors
+curl -s http://localhost:8080/horizon/api/stats | head -c 200 # Horizon dashboard API responds
 ```
 
 Architecture notes will be added as development progresses.
