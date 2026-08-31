@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Pagination } from '../../components/Pagination'
+import { ScrollHint } from '../../components/ScrollHint'
 import { StatusBadge, type BadgeColor } from '../../components/StatusBadge'
 import type { ImportBatch, ImportBatchStatus, PaginationMeta } from '../../types/api'
 
@@ -22,6 +23,7 @@ export function ImportBatchList({ batches, meta, onPageChange }: ImportBatchList
 
   return (
     <div>
+      <ScrollHint />
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50">

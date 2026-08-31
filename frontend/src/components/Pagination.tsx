@@ -14,7 +14,7 @@ export function Pagination({ meta, onPageChange }: PaginationProps) {
 
   return (
     <nav
-      className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm text-gray-600"
+      className="flex flex-col items-center gap-2 border-t border-gray-200 px-4 py-3 text-sm text-gray-600 sm:flex-row sm:justify-between"
       aria-label={t('pagination.next')}
     >
       <span>{t('pagination.summary', { total: meta.total, from: meta.from ?? 0, to: meta.to ?? 0 })}</span>

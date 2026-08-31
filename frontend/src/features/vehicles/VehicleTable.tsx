@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { Pagination } from '../../components/Pagination'
+import { ScrollHint } from '../../components/ScrollHint'
 import { StatusBadge, type BadgeColor } from '../../components/StatusBadge'
 import type { PaginationMeta, Vehicle, VehicleStatus } from '../../types/api'
 
@@ -65,6 +66,7 @@ export function VehicleTable({ vehicles, sort, onSortChange, meta, onPageChange 
 
   return (
     <div>
+      <ScrollHint />
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50">
