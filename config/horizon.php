@@ -206,7 +206,15 @@ return [
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 128,
-            'tries' => 1,
+            // Address/geocoding/route jobs call $this->release() on a
+            // RateLimitedException as their normal retry path (see
+            // ResolveImportRowAddressesJob, ComputeImportRowRouteJob). Under
+            // Horizon, a released job is marked failed on its *next* pickup
+            // if attempts() already exceeds tries — with the stock tries=1
+            // that fires on the very first release, before the job ever
+            // gets to actually retry. Matches the tries=3 the old plain
+            // `queue:work --tries=3` process ran with.
+            'tries' => 3,
             'timeout' => 60,
             'nice' => 0,
         ],
