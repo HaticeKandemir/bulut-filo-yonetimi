@@ -1,6 +1,8 @@
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { ImportRowsTable } from '../features/imports/ImportRowsTable'
+import { RouteMap } from '../features/imports/RouteMap'
 import { useImportBatch } from '../features/imports/useImportBatch'
 import { useImportBatchRows } from '../features/imports/useImportBatchRows'
 import { useImportRowsParams } from '../features/imports/useImportRowsParams'
@@ -17,6 +19,44 @@ export function ImportBatchPage() {
     isPending: rowsPending,
     isError: rowsError,
   } = useImportBatchRows(batchId, searchParams, batchResponse?.data.status, status !== '')
+
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set())
+
+  const handleStatusChange = (value: string) => {
+    setSelectedRowIds(new Set())
+    setStatus(value)
+  }
+
+  const handlePageChange = (page: number) => {
+    setSelectedRowIds(new Set())
+    setPage(page)
+  }
+
+  const handleToggleSelect = (rowId: number) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(rowId)) {
+        next.delete(rowId)
+      } else {
+        next.add(rowId)
+      }
+      return next
+    })
+  }
+
+  const selectedRoutes = useMemo(
+    () =>
+      (rowsResponse?.data ?? [])
+        .filter((row) => selectedRowIds.has(row.id) && row.route !== null && row.start_coordinates !== null && row.end_coordinates !== null)
+        .map((row) => ({
+          id: row.id,
+          label: `${row.plate ?? row.vin ?? ''}`,
+          encodedPath: row.route!.polyline,
+          start: row.start_coordinates!,
+          end: row.end_coordinates!,
+        })),
+    [rowsResponse, selectedRowIds],
+  )
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -39,10 +79,21 @@ export function ImportBatchPage() {
         <ImportRowsTable
           rows={rowsResponse.data}
           meta={rowsResponse.meta}
-          onPageChange={setPage}
+          onPageChange={handlePageChange}
           status={status}
-          onStatusChange={setStatus}
+          onStatusChange={handleStatusChange}
+          selectedRowIds={selectedRowIds}
+          onToggleSelect={handleToggleSelect}
         />
+      )}
+
+      {selectedRoutes.length > 0 && (
+        <section className="pt-6">
+          <h2 className="pb-2 text-lg font-semibold text-gray-900">
+            {t('imports.map.title', { count: selectedRoutes.length })}
+          </h2>
+          <RouteMap routes={selectedRoutes} />
+        </section>
       )}
     </main>
   )

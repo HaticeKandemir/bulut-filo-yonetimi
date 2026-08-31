@@ -95,6 +95,7 @@
     },
     "rows": {
       "columns": {
+        "select": "Haritada göstermek için seç",
         "rowNumber": "Satır",
         "vin": "Şasi No",
         "plate": "Plaka",
@@ -109,6 +110,12 @@
         "allStatuses": "Tüm durumlar"
       },
       "empty": "Satır bulunamadı."
+    },
+    "map": {
+      "title": "Seçili rotalar ({{count}})",
+      "start": "Başlangıç",
+      "end": "Bitiş",
+      "noRouteHint": "Bu satır için hesaplanmış bir rota yok."
     }
   }
 }

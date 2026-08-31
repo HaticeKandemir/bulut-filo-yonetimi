@@ -15,6 +15,8 @@ interface ImportRowsTableProps {
   onPageChange: (page: number) => void
   status: ImportRowStatus | ''
   onStatusChange: (status: string) => void
+  selectedRowIds: ReadonlySet<number>
+  onToggleSelect: (rowId: number) => void
 }
 
 function formatRoute(row: ImportRow, t: (key: string) => string): string {
@@ -28,7 +30,15 @@ function formatRoute(row: ImportRow, t: (key: string) => string): string {
   return `${km} km, ${minutes} dk`
 }
 
-export function ImportRowsTable({ rows, meta, onPageChange, status, onStatusChange }: ImportRowsTableProps) {
+export function ImportRowsTable({
+  rows,
+  meta,
+  onPageChange,
+  status,
+  onStatusChange,
+  selectedRowIds,
+  onToggleSelect,
+}: ImportRowsTableProps) {
   const { t } = useTranslation()
 
   return (
@@ -50,6 +60,9 @@ export function ImportRowsTable({ rows, meta, onPageChange, status, onStatusChan
         <table className="w-full text-left text-sm">
           <thead>
             <tr>
+              <th className="border-b px-3 py-2 font-medium text-gray-700">
+                <span className="sr-only">{t('imports.rows.columns.select')}</span>
+              </th>
               <th className="border-b px-3 py-2 font-medium text-gray-700">{t('imports.rows.columns.rowNumber')}</th>
               <th className="border-b px-3 py-2 font-medium text-gray-700">{t('imports.rows.columns.vin')}</th>
               <th className="border-b px-3 py-2 font-medium text-gray-700">{t('imports.rows.columns.plate')}</th>
@@ -63,35 +76,48 @@ export function ImportRowsTable({ rows, meta, onPageChange, status, onStatusChan
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-3 py-6 text-center text-gray-500">
+                <td colSpan={9} className="px-3 py-6 text-center text-gray-500">
                   {t('imports.rows.empty')}
                 </td>
               </tr>
             )}
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b align-top">
-                <td className="px-3 py-2">{row.row_number}</td>
-                <td className="px-3 py-2">{row.vin}</td>
-                <td className="px-3 py-2">{row.plate}</td>
-                <td className="px-3 py-2">
-                  {row.brand} {row.model}
-                </td>
-                <td className="px-3 py-2">{row.institution_code}</td>
-                <td className={`px-3 py-2 font-medium ${ROW_STATUS_CLASSES[row.status]}`}>
-                  <div>{t(`imports.rowStatus.${row.status}`)}</div>
-                  {row.status === 'needs_review' && row.conflicting_vehicle_vin !== null && (
-                    <div className="text-xs font-normal text-gray-500">
-                      {t('imports.rows.conflictingVin', { vin: row.conflicting_vehicle_vin })}
-                    </div>
-                  )}
-                  {row.status === 'failed' && row.error_message !== null && (
-                    <div className="text-xs font-normal text-gray-500">{row.error_message}</div>
-                  )}
-                </td>
-                <td className="px-3 py-2 text-gray-700">{t(`imports.addressStatus.${row.address_resolution_status}`)}</td>
-                <td className="px-3 py-2 text-gray-700">{formatRoute(row, t)}</td>
-              </tr>
-            ))}
+            {rows.map((row) => {
+              const hasRoute = row.route_computation_status === 'computed' && row.route !== null
+
+              return (
+                <tr key={row.id} className="border-b align-top">
+                  <td className="px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedRowIds.has(row.id)}
+                      disabled={!hasRoute}
+                      onChange={() => onToggleSelect(row.id)}
+                      title={hasRoute ? undefined : t('imports.map.noRouteHint')}
+                    />
+                  </td>
+                  <td className="px-3 py-2">{row.row_number}</td>
+                  <td className="px-3 py-2">{row.vin}</td>
+                  <td className="px-3 py-2">{row.plate}</td>
+                  <td className="px-3 py-2">
+                    {row.brand} {row.model}
+                  </td>
+                  <td className="px-3 py-2">{row.institution_code}</td>
+                  <td className={`px-3 py-2 font-medium ${ROW_STATUS_CLASSES[row.status]}`}>
+                    <div>{t(`imports.rowStatus.${row.status}`)}</div>
+                    {row.status === 'needs_review' && row.conflicting_vehicle_vin !== null && (
+                      <div className="text-xs font-normal text-gray-500">
+                        {t('imports.rows.conflictingVin', { vin: row.conflicting_vehicle_vin })}
+                      </div>
+                    )}
+                    {row.status === 'failed' && row.error_message !== null && (
+                      <div className="text-xs font-normal text-gray-500">{row.error_message}</div>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-gray-700">{t(`imports.addressStatus.${row.address_resolution_status}`)}</td>
+                  <td className="px-3 py-2 text-gray-700">{formatRoute(row, t)}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
