@@ -47,9 +47,9 @@ services:
       retries: 5
       start_period: 5s
 
-  queue:
+  horizon:
     image: bulut-filo-yonetimi-app:local
-    command: php artisan queue:work --tries=3
+    command: php artisan horizon
     volumes:
       - ./:/var/www/html
     depends_on:
