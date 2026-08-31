@@ -58,7 +58,7 @@ final class VehicleRepository
         return Cache::tags([Vehicle::CACHE_TAG])->remember(
             "vehicles:show:{$vehicle->id}",
             now()->addMinutes(self::CACHE_TTL_MINUTES),
-            fn () => (new VehicleResource($vehicle->load(['institution', 'activePlate'])))->response()->getData(true),
+            fn () => (new VehicleResource($vehicle->load(['institution', 'activePlate', 'plates'])))->response()->getData(true),
         );
     }
 
