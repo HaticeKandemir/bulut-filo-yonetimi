@@ -7,14 +7,26 @@ export async function checkBackendHealth(): Promise<boolean> {
   return response.ok
 }
 
+export interface ValidationErrorBody {
+  message: string
+  errors?: Record<string, string[]>
+}
+
 export class ApiError extends Error {
   readonly status: number
+  readonly body: ValidationErrorBody | undefined
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, body?: ValidationErrorBody) {
     super(message)
     this.name = 'ApiError'
     this.status = status
+    this.body = body
   }
+}
+
+async function throwApiError(method: string, path: string, response: Response): Promise<never> {
+  const body = (await response.json().catch(() => undefined)) as ValidationErrorBody | undefined
+  throw new ApiError(`${method} ${path} failed with status ${response.status}`, response.status, body)
 }
 
 export async function apiGet<T>(path: string, params?: URLSearchParams): Promise<T> {
@@ -23,7 +35,20 @@ export async function apiGet<T>(path: string, params?: URLSearchParams): Promise
   const response = await fetch(url)
 
   if (!response.ok) {
-    throw new ApiError(`GET ${path} failed with status ${response.status}`, response.status)
+    await throwApiError('GET', path, response)
+  }
+
+  return (await response.json()) as T
+}
+
+export async function apiPostForm<T>(path: string, formData: FormData): Promise<T> {
+  const response = await fetch(`${API_V1_BASE_URL}${path}`, {
+    method: 'POST',
+    body: formData,
+  })
+
+  if (!response.ok) {
+    await throwApiError('POST', path, response)
   }
 
   return (await response.json()) as T

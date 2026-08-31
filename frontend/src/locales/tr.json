@@ -10,6 +10,17 @@
     "backendStatus": "Backend durumu",
     "connected": "Bağlandı"
   },
+  "nav": {
+    "home": "Ana Sayfa",
+    "vehicles": "Araçlar",
+    "imports": "İçe Aktarımlar"
+  },
+  "pagination": {
+    "summary": "{{total}} kayıttan {{from}}-{{to}} arası gösteriliyor",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "pageOf": "Sayfa {{current}} / {{last}}"
+  },
   "vehicles": {
     "title": "Araçlar",
     "columns": {
@@ -31,12 +42,73 @@
       "allStatuses": "Tüm durumlar",
       "allInstitutions": "Tüm kurumlar"
     },
-    "empty": "Kayıt bulunamadı.",
-    "pagination": {
-      "summary": "{{total}} kayıttan {{from}}-{{to}} arası gösteriliyor",
-      "previous": "Önceki",
-      "next": "Sonraki",
-      "pageOf": "Sayfa {{current}} / {{last}}"
+    "empty": "Kayıt bulunamadı."
+  },
+  "imports": {
+    "title": "İçe Aktarımlar",
+    "upload": {
+      "label": "Excel dosyası seçin (.xlsx, .xls)",
+      "submit": "Yükle",
+      "uploading": "Yükleniyor...",
+      "errors": {
+        "required": "Lütfen bir dosya seçin.",
+        "invalidType": "Sadece Excel dosyaları (.xlsx, .xls) kabul edilir."
+      }
+    },
+    "list": {
+      "columns": {
+        "filename": "Dosya",
+        "status": "Durum",
+        "createdAt": "Yüklenme Tarihi"
+      },
+      "empty": "Henüz içe aktarım yapılmadı.",
+      "view": "Görüntüle"
+    },
+    "batchStatus": {
+      "pending": "Bekliyor",
+      "processing": "İşleniyor",
+      "completed": "Tamamlandı",
+      "failed": "Başarısız"
+    },
+    "batch": {
+      "title": "İçe Aktarım #{{id}}",
+      "backToList": "İçe aktarımlara dön",
+      "notFound": "İçe aktarım bulunamadı."
+    },
+    "rowStatus": {
+      "pending": "Bekliyor",
+      "processed": "İşlendi",
+      "needs_review": "İnceleme Gerekiyor",
+      "failed": "Başarısız"
+    },
+    "addressStatus": {
+      "pending": "Bekliyor",
+      "resolved": "Çözümlendi",
+      "failed": "Başarısız",
+      "skipped": "Atlandı"
+    },
+    "routeStatus": {
+      "pending": "Bekliyor",
+      "computed": "Hesaplandı",
+      "failed": "Başarısız",
+      "skipped": "Atlandı"
+    },
+    "rows": {
+      "columns": {
+        "rowNumber": "Satır",
+        "vin": "Şasi No",
+        "plate": "Plaka",
+        "brandModel": "Marka / Model",
+        "institution": "Kurum",
+        "status": "Durum",
+        "address": "Adres",
+        "route": "Rota"
+      },
+      "conflictingVin": "Çakışan araç şasi no: {{vin}}",
+      "filters": {
+        "allStatuses": "Tüm durumlar"
+      },
+      "empty": "Satır bulunamadı."
     }
   }
 }
