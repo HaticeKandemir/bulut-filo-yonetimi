@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Pagination } from '../../components/Pagination'
+import { ScrollHint } from '../../components/ScrollHint'
 import { StatusBadge, type BadgeColor } from '../../components/StatusBadge'
 import type { AddressResolutionStatus, ImportRow, ImportRowStatus, PaginationMeta, RouteComputationStatus } from '../../types/api'
 
@@ -67,6 +68,7 @@ export function ImportRowsTable({
           <option value="failed">{t('imports.rowStatus.failed')}</option>
         </select>
       </div>
+      <ScrollHint />
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50">

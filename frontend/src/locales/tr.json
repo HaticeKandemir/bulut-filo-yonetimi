@@ -4,7 +4,8 @@
   },
   "common": {
     "loading": "Yükleniyor...",
-    "error": "Bir hata oluştu."
+    "error": "Bir hata oluştu.",
+    "scrollHint": "Diğer sütunlar için yatayda kaydırın →"
   },
   "home": {
     "backendStatus": "Backend durumu",
