@@ -44,18 +44,24 @@ export function UploadImportForm({ onUploaded }: UploadImportFormProps) {
   })
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="flex flex-col gap-2 rounded border border-gray-200 p-4">
+    <form onSubmit={(event) => void onSubmit(event)} className="flex flex-col gap-3">
       <label htmlFor="import-file" className="text-sm font-medium text-gray-700">
         {t('imports.upload.label')}
       </label>
-      <input id="import-file" type="file" accept=".xlsx,.xls" {...register('file')} className="text-sm" />
+      <input
+        id="import-file"
+        type="file"
+        accept=".xlsx,.xls"
+        {...register('file')}
+        className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+      />
       {errors.file?.message === 'required' && <p className="text-sm text-red-600">{t('imports.upload.errors.required')}</p>}
       {errors.file?.message === 'invalidType' && <p className="text-sm text-red-600">{t('imports.upload.errors.invalidType')}</p>}
       {upload.isError && <p className="text-sm text-red-600">{upload.error.body?.message ?? t('common.error')}</p>}
       <button
         type="submit"
         disabled={upload.isPending}
-        className="w-fit rounded bg-gray-900 px-4 py-1.5 text-sm text-white disabled:opacity-40"
+        className="w-fit rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {upload.isPending ? t('imports.upload.uploading') : t('imports.upload.submit')}
       </button>

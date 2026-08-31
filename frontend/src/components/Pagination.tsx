@@ -6,18 +6,24 @@ interface PaginationProps {
   onPageChange: (page: number) => void
 }
 
+const buttonClassName =
+  'rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white'
+
 export function Pagination({ meta, onPageChange }: PaginationProps) {
   const { t } = useTranslation()
 
   return (
-    <nav className="flex items-center justify-between py-3 text-sm text-gray-600" aria-label={t('pagination.next')}>
+    <nav
+      className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm text-gray-600"
+      aria-label={t('pagination.next')}
+    >
       <span>{t('pagination.summary', { total: meta.total, from: meta.from ?? 0, to: meta.to ?? 0 })}</span>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-3">
         <button
           type="button"
           disabled={meta.current_page <= 1}
           onClick={() => onPageChange(meta.current_page - 1)}
-          className="disabled:opacity-40"
+          className={buttonClassName}
         >
           {t('pagination.previous')}
         </button>
@@ -26,7 +32,7 @@ export function Pagination({ meta, onPageChange }: PaginationProps) {
           type="button"
           disabled={meta.current_page >= meta.last_page}
           onClick={() => onPageChange(meta.current_page + 1)}
-          className="disabled:opacity-40"
+          className={buttonClassName}
         >
           {t('pagination.next')}
         </button>

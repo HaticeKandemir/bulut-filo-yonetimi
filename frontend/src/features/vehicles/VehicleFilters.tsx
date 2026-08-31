@@ -22,6 +22,9 @@ function flattenInstitutions(nodes: InstitutionNode[], depth = 0): FlatInstituti
   ])
 }
 
+const controlClassName =
+  'rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500'
+
 interface DebouncedTextFilterProps {
   value: string
   onChange: (value: string) => void
@@ -50,7 +53,7 @@ function DebouncedTextFilter({ value, onChange, placeholder }: DebouncedTextFilt
         setLocalValue(event.target.value)
         debouncedOnChange(event.target.value)
       }}
-      className="rounded border border-gray-300 px-3 py-1.5"
+      className={controlClassName}
     />
   )
 }
@@ -60,7 +63,7 @@ export function VehicleFilters({ params, institutions, onFilterChange }: Vehicle
   const flatInstitutions = flattenInstitutions(institutions)
 
   return (
-    <div className="flex flex-wrap gap-3 py-4">
+    <div className="flex flex-wrap gap-3">
       <DebouncedTextFilter
         value={params.vin}
         placeholder={t('vehicles.filters.vin')}
@@ -74,7 +77,7 @@ export function VehicleFilters({ params, institutions, onFilterChange }: Vehicle
       <select
         value={params.status}
         onChange={(event) => onFilterChange('filter[status]', event.target.value)}
-        className="rounded border border-gray-300 px-3 py-1.5"
+        className={controlClassName}
       >
         <option value="">{t('vehicles.filters.allStatuses')}</option>
         <option value="active">{t('vehicles.status.active')}</option>
@@ -84,7 +87,7 @@ export function VehicleFilters({ params, institutions, onFilterChange }: Vehicle
       <select
         value={params.institutionId}
         onChange={(event) => onFilterChange('filter[institution_id]', event.target.value)}
-        className="rounded border border-gray-300 px-3 py-1.5"
+        className={controlClassName}
       >
         <option value="">{t('vehicles.filters.allInstitutions')}</option>
         {flatInstitutions.map((institution) => (
