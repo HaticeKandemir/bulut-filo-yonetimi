@@ -38,31 +38,42 @@ export function RouteMap({ routes }: RouteMapProps) {
     return null
   }
 
-  return (
-    <APIProvider apiKey={apiKey}>
-      <Map
-        mapId="DEMO_MAP_ID"
-        defaultBounds={computeBounds(routes)}
-        style={{ width: '100%', height: '480px' }}
-        gestureHandling="greedy"
-        disableDefaultUI={false}
-      >
-        {routes.map((route, index) => {
-          const color = ROUTE_COLORS[index % ROUTE_COLORS.length]
+  const coloredRoutes = routes.map((route, index) => ({ ...route, color: ROUTE_COLORS[index % ROUTE_COLORS.length] }))
 
-          return (
+  return (
+    <div>
+      {/* Always-visible color legend: AdvancedMarker's `title` is a hover-only
+          tooltip, which doesn't work on touch devices, so the route-to-color
+          mapping can't rely on it as the only way to read it. */}
+      <ul className="flex flex-wrap gap-x-4 gap-y-1 pb-2 text-sm text-gray-700">
+        {coloredRoutes.map((route) => (
+          <li key={route.id} className="flex items-center gap-1.5">
+            <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: route.color }} />
+            {route.label}
+          </li>
+        ))}
+      </ul>
+      <APIProvider apiKey={apiKey}>
+        <Map
+          mapId="DEMO_MAP_ID"
+          defaultBounds={computeBounds(routes)}
+          style={{ width: '100%', height: '480px' }}
+          gestureHandling="greedy"
+          disableDefaultUI={false}
+        >
+          {coloredRoutes.map((route) => (
             <Fragment key={route.id}>
-              <Polyline encodedPath={route.encodedPath} strokeColor={color} strokeOpacity={0.8} strokeWeight={4} />
+              <Polyline encodedPath={route.encodedPath} strokeColor={route.color} strokeOpacity={0.8} strokeWeight={4} />
               <AdvancedMarker position={route.start} title={`${route.label} — ${t('imports.map.start')}`}>
-                <Pin background={color} borderColor={color} glyphColor="#ffffff" />
+                <Pin background={route.color} borderColor={route.color} glyphColor="#ffffff" />
               </AdvancedMarker>
               <AdvancedMarker position={route.end} title={`${route.label} — ${t('imports.map.end')}`}>
-                <Pin background="#ffffff" borderColor={color} glyphColor={color} />
+                <Pin background="#ffffff" borderColor={route.color} glyphColor={route.color} />
               </AdvancedMarker>
             </Fragment>
-          )
-        })}
-      </Map>
-    </APIProvider>
+          ))}
+        </Map>
+      </APIProvider>
+    </div>
   )
 }
