@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Observers\VehiclePlateObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable(['vehicle_id', 'plate', 'assigned_at', 'released_at'])]
+#[ObservedBy(VehiclePlateObserver::class)]
 class VehiclePlate extends Model
 {
     /**
