@@ -11,6 +11,7 @@ use App\Exceptions\RateLimitedException;
 use App\Models\GeocodedAddress;
 use App\Support\AddressHash;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\RequestException;
@@ -43,12 +44,21 @@ final class GoogleGeocoder implements GeocoderInterface
                 fn () => throw RateLimitedException::throttled(),
             );
 
-        GeocodedAddress::create([
-            'normalized_address_hash' => $hash,
-            'normalized_address' => $normalizedAddress,
-            'latitude' => $coordinates->latitude,
-            'longitude' => $coordinates->longitude,
-        ]);
+        try {
+            GeocodedAddress::create([
+                'normalized_address_hash' => $hash,
+                'normalized_address' => $normalizedAddress,
+                'latitude' => $coordinates->latitude,
+                'longitude' => $coordinates->longitude,
+            ]);
+        } catch (QueryException $e) {
+            // Unique constraint race: a concurrent job cached this same
+            // normalized address first (Horizon runs multiple workers) —
+            // its cached row is equivalent, nothing left to do.
+            if (GeocodedAddress::where('normalized_address_hash', $hash)->doesntExist()) {
+                throw $e;
+            }
+        }
 
         return $coordinates;
     }
