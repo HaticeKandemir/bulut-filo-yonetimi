@@ -1,6 +1,7 @@
 import { createColumnHelper, flexRender, tableFeatures, useTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Pagination } from '../../components/Pagination'
 import type { PaginationMeta, Vehicle } from '../../types/api'
 
 const features = tableFeatures({})
@@ -96,28 +97,7 @@ export function VehicleTable({ vehicles, sort, onSortChange, meta, onPageChange 
           </tbody>
         </table>
       </div>
-      <nav className="flex items-center justify-between py-3 text-sm text-gray-600" aria-label={t('vehicles.pagination.next')}>
-        <span>{t('vehicles.pagination.summary', { total: meta.total, from: meta.from ?? 0, to: meta.to ?? 0 })}</span>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            disabled={meta.current_page <= 1}
-            onClick={() => onPageChange(meta.current_page - 1)}
-            className="disabled:opacity-40"
-          >
-            {t('vehicles.pagination.previous')}
-          </button>
-          <span>{t('vehicles.pagination.pageOf', { current: meta.current_page, last: meta.last_page })}</span>
-          <button
-            type="button"
-            disabled={meta.current_page >= meta.last_page}
-            onClick={() => onPageChange(meta.current_page + 1)}
-            className="disabled:opacity-40"
-          >
-            {t('vehicles.pagination.next')}
-          </button>
-        </div>
-      </nav>
+      <Pagination meta={meta} onPageChange={onPageChange} />
     </div>
   )
 }

@@ -59,3 +59,49 @@ export interface Vehicle {
   active_plate: VehicleActivePlate | null
   created_at: string
 }
+
+export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'failed'
+export type ImportRowStatus = 'pending' | 'processed' | 'needs_review' | 'failed'
+export type AddressResolutionStatus = 'pending' | 'resolved' | 'failed' | 'skipped'
+export type RouteComputationStatus = 'pending' | 'computed' | 'failed' | 'skipped'
+
+export interface ImportBatch {
+  id: number
+  original_filename: string
+  status: ImportBatchStatus
+  created_at: string
+}
+
+export interface ImportRowRoute {
+  distance_meters: number
+  duration_seconds: number
+  polyline: string
+}
+
+export interface GeoCoordinates {
+  lat: number
+  lng: number
+}
+
+export interface ImportRow {
+  id: number
+  row_number: number
+  vin: string | null
+  plate: string | null
+  brand: string | null
+  model: string | null
+  institution_code: string | null
+  start_address: string | null
+  end_address: string | null
+  status: ImportRowStatus
+  error_message: string | null
+  vehicle_id: number | null
+  conflicting_vehicle_vin: string | null
+  address_resolution_status: AddressResolutionStatus
+  address_resolution_error: string | null
+  start_coordinates: GeoCoordinates | null
+  end_coordinates: GeoCoordinates | null
+  route_computation_status: RouteComputationStatus
+  route_computation_error: string | null
+  route: ImportRowRoute | null
+}

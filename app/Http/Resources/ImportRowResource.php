@@ -23,6 +23,13 @@ class ImportRowResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'row_number' => $this->resource->row_number,
+            'vin' => $this->resource->raw_data['sasi_no'] ?? null,
+            'plate' => $this->resource->raw_data['plaka'] ?? null,
+            'brand' => $this->resource->raw_data['marka'] ?? null,
+            'model' => $this->resource->raw_data['model'] ?? null,
+            'institution_code' => $this->resource->raw_data['kurum_kodu'] ?? null,
+            'start_address' => $this->resource->raw_data['baslangic_adresi'] ?? null,
+            'end_address' => $this->resource->raw_data['bitis_adresi'] ?? null,
             'status' => $this->resource->status->value,
             'error_message' => $this->resource->error_message,
             'vehicle_id' => $this->resource->vehicle_id,

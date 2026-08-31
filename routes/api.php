@@ -7,6 +7,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleImportController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('vehicle-imports', [VehicleImportController::class, 'index']);
 Route::post('vehicle-imports', [VehicleImportController::class, 'store']);
 Route::get('vehicle-imports/{importBatch}', [VehicleImportController::class, 'show']);
 Route::get('vehicle-imports/{importBatch}/rows', [VehicleImportController::class, 'rows']);

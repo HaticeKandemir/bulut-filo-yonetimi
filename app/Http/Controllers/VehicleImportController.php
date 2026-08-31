@@ -16,6 +16,19 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class VehicleImportController extends Controller
 {
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        $batches = ImportBatch::query()
+            ->when(
+                $request->query('status'),
+                fn ($query, $status) => $query->where('status', $status),
+            )
+            ->orderByDesc('created_at')
+            ->paginate();
+
+        return ImportBatchResource::collection($batches);
+    }
+
     public function store(StoreVehicleImportRequest $request): JsonResponse
     {
         $file = $request->file('file');
