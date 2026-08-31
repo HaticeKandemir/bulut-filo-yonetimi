@@ -1,11 +1,21 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
+import { Card } from '../components/Card'
+import { StatusBadge, type BadgeColor } from '../components/StatusBadge'
+import type { ImportBatchStatus } from '../types/api'
 import { ImportRowsTable } from '../features/imports/ImportRowsTable'
 import { RouteMap } from '../features/imports/RouteMap'
 import { useImportBatch } from '../features/imports/useImportBatch'
 import { useImportBatchRows } from '../features/imports/useImportBatchRows'
 import { useImportRowsParams } from '../features/imports/useImportRowsParams'
+
+const STATUS_COLORS: Record<ImportBatchStatus, BadgeColor> = {
+  pending: 'gray',
+  processing: 'blue',
+  completed: 'green',
+  failed: 'red',
+}
 
 export function ImportBatchPage() {
   const { t } = useTranslation()
@@ -60,39 +70,44 @@ export function ImportBatchPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <Link to="/imports" className="text-sm text-gray-600 underline">
+      <Link to="/imports" className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline">
         {t('imports.batch.backToList')}
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-gray-900">{t('imports.batch.title', { id: batchId })}</h1>
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">{t('imports.batch.title', { id: batchId })}</h1>
 
-      {batchPending && <p>{t('common.loading')}</p>}
-      {batchError && <p>{t('imports.batch.notFound')}</p>}
+      {batchPending && <p className="mt-4 text-sm text-gray-500">{t('common.loading')}</p>}
+      {batchError && <p className="mt-4 text-sm text-red-600">{t('imports.batch.notFound')}</p>}
       {batchResponse && (
-        <p className="py-2 text-sm text-gray-700">
-          {batchResponse.data.original_filename} — {t(`imports.batchStatus.${batchResponse.data.status}`)}
+        <p className="mt-2 flex items-center gap-2 text-sm text-gray-700">
+          <span className="font-medium text-gray-900">{batchResponse.data.original_filename}</span>
+          <StatusBadge color={STATUS_COLORS[batchResponse.data.status]}>
+            {t(`imports.batchStatus.${batchResponse.data.status}`)}
+          </StatusBadge>
         </p>
       )}
 
-      {rowsPending && <p>{t('common.loading')}</p>}
-      {rowsError && <p>{t('common.error')}</p>}
+      {rowsPending && <p className="mt-6 text-sm text-gray-500">{t('common.loading')}</p>}
+      {rowsError && <p className="mt-6 text-sm text-red-600">{t('common.error')}</p>}
       {rowsResponse && (
-        <ImportRowsTable
-          rows={rowsResponse.data}
-          meta={rowsResponse.meta}
-          onPageChange={handlePageChange}
-          status={status}
-          onStatusChange={handleStatusChange}
-          selectedRowIds={selectedRowIds}
-          onToggleSelect={handleToggleSelect}
-        />
+        <Card className="mt-6 overflow-hidden">
+          <ImportRowsTable
+            rows={rowsResponse.data}
+            meta={rowsResponse.meta}
+            onPageChange={handlePageChange}
+            status={status}
+            onStatusChange={handleStatusChange}
+            selectedRowIds={selectedRowIds}
+            onToggleSelect={handleToggleSelect}
+          />
+        </Card>
       )}
 
       {selectedRoutes.length > 0 && (
-        <section className="pt-6">
-          <h2 className="pb-2 text-lg font-semibold text-gray-900">
-            {t('imports.map.title', { count: selectedRoutes.length })}
-          </h2>
-          <RouteMap routes={selectedRoutes} />
+        <section className="mt-6">
+          <h2 className="mb-2 text-lg font-semibold text-gray-900">{t('imports.map.title', { count: selectedRoutes.length })}</h2>
+          <Card className="overflow-hidden p-4">
+            <RouteMap routes={selectedRoutes} />
+          </Card>
         </section>
       )}
     </main>
