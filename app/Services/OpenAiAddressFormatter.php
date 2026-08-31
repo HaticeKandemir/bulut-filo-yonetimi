@@ -10,6 +10,7 @@ use App\Exceptions\RateLimitedException;
 use App\Models\NormalizedAddress;
 use App\Support\AddressHash;
 use Illuminate\Contracts\Redis\Factory as RedisFactory;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\RequestException;
@@ -41,11 +42,20 @@ final class OpenAiAddressFormatter implements AddressFormatterInterface
                 fn () => throw RateLimitedException::throttled(),
             );
 
-        NormalizedAddress::create([
-            'raw_address_hash' => $hash,
-            'raw_address' => $rawAddress,
-            'normalized_address' => $normalized,
-        ]);
+        try {
+            NormalizedAddress::create([
+                'raw_address_hash' => $hash,
+                'raw_address' => $rawAddress,
+                'normalized_address' => $normalized,
+            ]);
+        } catch (QueryException $e) {
+            // Unique constraint race: a concurrent job cached this same raw
+            // address first (Horizon runs multiple workers) — its cached
+            // row is equivalent, nothing left to do.
+            if (NormalizedAddress::where('raw_address_hash', $hash)->doesntExist()) {
+                throw $e;
+            }
+        }
 
         return $normalized;
     }
