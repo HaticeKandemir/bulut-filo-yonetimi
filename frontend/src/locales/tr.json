@@ -29,7 +29,8 @@
       "model": "Model",
       "plate": "Plaka",
       "institution": "Kurum",
-      "status": "Durum"
+      "status": "Durum",
+      "detail": "Detay"
     },
     "status": {
       "active": "Aktif",
@@ -42,7 +43,23 @@
       "allStatuses": "Tüm durumlar",
       "allInstitutions": "Tüm kurumlar"
     },
-    "empty": "Kayıt bulunamadı."
+    "empty": "Kayıt bulunamadı.",
+    "detail": {
+      "backToList": "Araç listesine dön",
+      "notFound": "Araç bulunamadı.",
+      "activePlate": "Aktif plaka",
+      "noActivePlate": "Aktif plaka yok",
+      "plateHistory": {
+        "title": "Plaka geçmişi",
+        "columns": {
+          "plate": "Plaka",
+          "assignedAt": "Atanma tarihi",
+          "releasedAt": "Bırakılma tarihi"
+        },
+        "active": "Aktif",
+        "empty": "Plaka geçmişi bulunamadı."
+      }
+    }
   },
   "imports": {
     "title": "İçe Aktarımlar",

@@ -49,6 +49,13 @@ export interface VehicleActivePlate {
   assigned_at: string
 }
 
+export interface VehiclePlateHistoryEntry {
+  plate: string
+  assigned_at: string
+  released_at: string
+  is_active: boolean
+}
+
 export interface Vehicle {
   id: number
   vin: string
@@ -58,6 +65,8 @@ export interface Vehicle {
   institution: InstitutionSummary
   active_plate: VehicleActivePlate | null
   created_at: string
+  /** Only present on the GET /vehicles/{id} response, not the list. */
+  plate_history?: VehiclePlateHistoryEntry[]
 }
 
 export type ImportBatchStatus = 'pending' | 'processing' | 'completed' | 'failed'

@@ -51,7 +51,7 @@ export function UploadImportForm({ onUploaded }: UploadImportFormProps) {
       <input id="import-file" type="file" accept=".xlsx,.xls" {...register('file')} className="text-sm" />
       {errors.file?.message === 'required' && <p className="text-sm text-red-600">{t('imports.upload.errors.required')}</p>}
       {errors.file?.message === 'invalidType' && <p className="text-sm text-red-600">{t('imports.upload.errors.invalidType')}</p>}
-      {upload.isError && <p className="text-sm text-red-600">{t('common.error')}</p>}
+      {upload.isError && <p className="text-sm text-red-600">{upload.error.body?.message ?? t('common.error')}</p>}
       <button
         type="submit"
         disabled={upload.isPending}

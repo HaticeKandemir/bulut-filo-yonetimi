@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\Vehicle;
+use App\Models\VehiclePlate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -38,6 +39,18 @@ class VehicleResource extends JsonResource
                     'plate' => $this->resource->activePlate->plate,
                     'assigned_at' => $this->resource->activePlate->assigned_at,
                 ],
+            ),
+            'plate_history' => $this->whenLoaded(
+                'plates',
+                fn () => $this->resource->plates
+                    ->sortByDesc('assigned_at')
+                    ->values()
+                    ->map(fn (VehiclePlate $plate) => [
+                        'plate' => $plate->plate,
+                        'assigned_at' => $plate->assigned_at,
+                        'released_at' => $plate->released_at,
+                        'is_active' => $plate->released_at->equalTo(VehiclePlate::ACTIVE_SENTINEL),
+                    ]),
             ),
             'created_at' => $this->resource->created_at,
         ];

@@ -1,6 +1,7 @@
 import { createColumnHelper, flexRender, tableFeatures, useTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { Pagination } from '../../components/Pagination'
 import type { PaginationMeta, Vehicle } from '../../types/api'
 
@@ -38,6 +39,15 @@ export function VehicleTable({ vehicles, sort, onSortChange, meta, onPageChange 
       columnHelper.accessor('status', {
         header: t('vehicles.columns.status'),
         cell: (info) => t(`vehicles.status.${info.getValue()}`),
+      }),
+      columnHelper.display({
+        id: 'detail',
+        header: t('vehicles.columns.detail'),
+        cell: ({ row }) => (
+          <Link to={`/vehicles/${row.original.id}`} className="text-gray-700 underline">
+            {t('vehicles.columns.detail')}
+          </Link>
+        ),
       }),
     ]),
     [t],

@@ -194,6 +194,31 @@ class VehicleControllerTest extends TestCase
         $response->assertJsonPath('data.active_plate.plate', '34 ABC 123');
     }
 
+    public function test_show_returns_plate_history_newest_first_with_active_flag(): void
+    {
+        $vehicle = Vehicle::factory()->create();
+        $oldPlate = VehiclePlate::create([
+            'vehicle_id' => $vehicle->id,
+            'plate' => '34 OLD 001',
+            'assigned_at' => now()->subDays(10),
+            'released_at' => now()->subDay(),
+        ]);
+        $currentPlate = VehiclePlate::create([
+            'vehicle_id' => $vehicle->id,
+            'plate' => '34 NEW 002',
+            'assigned_at' => now(),
+        ]);
+
+        $response = $this->getJson("/api/v1/vehicles/{$vehicle->id}");
+
+        $response->assertOk();
+        $response->assertJsonCount(2, 'data.plate_history');
+        $response->assertJsonPath('data.plate_history.0.plate', $currentPlate->plate);
+        $response->assertJsonPath('data.plate_history.0.is_active', true);
+        $response->assertJsonPath('data.plate_history.1.plate', $oldPlate->plate);
+        $response->assertJsonPath('data.plate_history.1.is_active', false);
+    }
+
     public function test_show_returns_404_for_missing_vehicle(): void
     {
         $this->getJson('/api/v1/vehicles/999999')->assertNotFound();
