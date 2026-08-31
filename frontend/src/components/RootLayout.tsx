@@ -14,12 +14,15 @@ export function RootLayout() {
       <header className="sticky top-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-6">
           <span className="hidden text-sm font-semibold tracking-tight text-gray-900 sm:inline">{t('app.title')}</span>
-          <nav className="flex gap-1">
+          <nav className="flex gap-1 overflow-x-auto">
             <NavLink to="/" end className={linkClassName}>
               {t('nav.home')}
             </NavLink>
             <NavLink to="/vehicles" className={linkClassName}>
               {t('nav.vehicles')}
+            </NavLink>
+            <NavLink to="/institutions" className={linkClassName}>
+              {t('nav.institutions')}
             </NavLink>
             <NavLink to="/imports" className={linkClassName}>
               {t('nav.imports')}

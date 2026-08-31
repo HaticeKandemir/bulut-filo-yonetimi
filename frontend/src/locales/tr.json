@@ -14,6 +14,7 @@
   "nav": {
     "home": "Ana Sayfa",
     "vehicles": "Araçlar",
+    "institutions": "Kurumlar",
     "imports": "İçe Aktarımlar"
   },
   "pagination": {
@@ -135,5 +136,9 @@
       "end": "Bitiş",
       "noRouteHint": "Bu satır için hesaplanmış bir rota yok."
     }
+  },
+  "institutions": {
+    "title": "Kurumlar",
+    "empty": "Kurum bulunamadı."
   }
 }

@@ -3,6 +3,7 @@ import { RootLayout } from './components/RootLayout'
 import { ImportBatchPage } from './pages/ImportBatchPage'
 import { ImportsPage } from './pages/ImportsPage'
 import { HomePage } from './pages/HomePage'
+import { InstitutionsPage } from './pages/InstitutionsPage'
 import { VehicleDetailPage } from './pages/VehicleDetailPage'
 import { VehiclesPage } from './pages/VehiclesPage'
 
@@ -13,6 +14,7 @@ export const router = createBrowserRouter([
       { path: '/', element: <HomePage /> },
       { path: '/vehicles', element: <VehiclesPage /> },
       { path: '/vehicles/:id', element: <VehicleDetailPage /> },
+      { path: '/institutions', element: <InstitutionsPage /> },
       { path: '/imports', element: <ImportsPage /> },
       { path: '/imports/:id', element: <ImportBatchPage /> },
     ],
