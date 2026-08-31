@@ -9,5 +9,34 @@
   "home": {
     "backendStatus": "Backend durumu",
     "connected": "Bağlandı"
+  },
+  "vehicles": {
+    "title": "Araçlar",
+    "columns": {
+      "vin": "Şasi No",
+      "brand": "Marka",
+      "model": "Model",
+      "plate": "Plaka",
+      "institution": "Kurum",
+      "status": "Durum"
+    },
+    "status": {
+      "active": "Aktif",
+      "passive": "Pasif",
+      "left_fleet": "Filodan Çıktı"
+    },
+    "filters": {
+      "vin": "Şasi no ile ara",
+      "plate": "Plaka ile ara",
+      "allStatuses": "Tüm durumlar",
+      "allInstitutions": "Tüm kurumlar"
+    },
+    "empty": "Kayıt bulunamadı.",
+    "pagination": {
+      "summary": "{{total}} kayıttan {{from}}-{{to}} arası gösteriliyor",
+      "previous": "Önceki",
+      "next": "Sonraki",
+      "pageOf": "Sayfa {{current}} / {{last}}"
+    }
   }
 }
