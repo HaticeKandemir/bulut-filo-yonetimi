@@ -6,12 +6,13 @@ export interface VehicleListParams {
   vin: string
   plate: string
   brand: string
+  model: string
   status: VehicleStatus | ''
   institutionId: string
   sort: string
 }
 
-export type VehicleFilterKey = `filter[${'vin' | 'plate' | 'brand' | 'status' | 'institution_id'}]`
+export type VehicleFilterKey = `filter[${'vin' | 'plate' | 'brand' | 'model' | 'status' | 'institution_id'}]`
 
 export function useVehicleListParams() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -21,6 +22,7 @@ export function useVehicleListParams() {
       vin: searchParams.get('filter[vin]') ?? '',
       plate: searchParams.get('filter[plate]') ?? '',
       brand: searchParams.get('filter[brand]') ?? '',
+      model: searchParams.get('filter[model]') ?? '',
       status: (searchParams.get('filter[status]') ?? '') as VehicleStatus | '',
       institutionId: searchParams.get('filter[institution_id]') ?? '',
       sort: searchParams.get('sort') ?? 'vin',
