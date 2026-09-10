@@ -5,12 +5,20 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Institution;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class InstitutionControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create(), 'sanctum');
+    }
 
     public function test_index_returns_nested_tree_at_arbitrary_depth(): void
     {
@@ -44,5 +52,16 @@ class InstitutionControllerTest extends TestCase
         $this->expectsDatabaseQueryCount(1);
 
         $this->getJson('/api/v1/institutions')->assertOk();
+    }
+
+    public function test_index_reflects_a_newly_created_institution_after_the_cache_was_already_warmed(): void
+    {
+        Institution::create(['name' => 'PTT', 'code' => 'PTT']);
+
+        $this->getJson('/api/v1/institutions')->assertJsonCount(1, 'data');
+
+        Institution::create(['name' => 'ANKA LOJİSTİK', 'code' => 'ANKA']);
+
+        $this->getJson('/api/v1/institutions')->assertJsonCount(2, 'data');
     }
 }
