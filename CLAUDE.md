@@ -39,7 +39,7 @@ php artisan horizon               # kuyruk worker
 ./vendor/bin/pest                 # testler
 ./vendor/bin/pint                 # kod stili
 ./vendor/bin/phpstan analyse      # statik analiz
-npm run dev / lint / typecheck    # frontend
+npm run dev / lint / typecheck / test   # frontend
 ```
 
 ---
@@ -137,9 +137,10 @@ Public metodlarda kısa PHPDoc bulunur. Fırlatılabilecek exception'lar `@throw
 ./vendor/bin/pest                 # testler
 npm run lint                      # ESLint
 npm run typecheck                 # tsc --noEmit
+npm run test                      # Vitest
 ```
 
-Bunlar GitHub Actions'ta her push'ta çalışır. Üçü de yeşil değilse iş tamamlanmış sayılmaz.
+Bunlar GitHub Actions'ta her push'ta çalışır. Hepsi yeşil değilse iş tamamlanmış sayılmaz.
 
 ## Git
 

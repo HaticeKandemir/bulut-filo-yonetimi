@@ -12,4 +12,5 @@ npm run dev          # start the Vite dev server
 npm run build         # tsc -b && vite build
 npm run lint          # oxlint
 npm run typecheck     # tsc --noEmit
+npm run test          # vitest run
 ```
