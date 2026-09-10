@@ -10,7 +10,6 @@ use App\Imports\VehicleRowsImport;
 use App\Models\ImportBatch;
 use App\Models\ImportRow;
 use App\Models\Institution;
-use App\Services\VehicleImportService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Carbon;
@@ -25,7 +24,13 @@ class ProcessVehicleImportJob implements ShouldQueue
         public readonly ImportBatch $importBatch,
     ) {}
 
-    public function handle(VehicleImportService $service): void
+    /**
+     * Seeds the batch's rows (once) and dispatches one ProcessImportRowJob
+     * per pending row, so the VIN/plate decision tree runs in parallel
+     * across queue workers instead of blocking inside a single job —
+     * matching the address/route stages, which are already per-row jobs.
+     */
+    public function handle(): void
     {
         $this->importBatch->update(['status' => ImportBatchStatus::Processing]);
 
@@ -33,20 +38,20 @@ class ProcessVehicleImportJob implements ShouldQueue
             $this->seedRows();
         }
 
+        $hasPendingRows = $this->importBatch->rows()->where('status', ImportRowStatus::Pending)->exists();
+
+        if (! $hasPendingRows) {
+            $this->importBatch->update(['status' => ImportBatchStatus::Completed]);
+
+            return;
+        }
+
         $institutionCodeToId = Institution::pluck('id', 'code')->all();
 
         $this->importBatch->rows()
             ->where('status', ImportRowStatus::Pending)
             ->orderBy('row_number')
-            ->each(function (ImportRow $row) use ($service, $institutionCodeToId): void {
-                $service->processRow($row, $institutionCodeToId);
-
-                // Address resolution is independent of the VIN/plate outcome —
-                // a needs_review/failed row can still have a valid address.
-                ResolveImportRowAddressesJob::dispatch($row);
-            });
-
-        $this->importBatch->update(['status' => ImportBatchStatus::Completed]);
+            ->each(fn (ImportRow $row) => ProcessImportRowJob::dispatch($row, $institutionCodeToId));
     }
 
     /**
