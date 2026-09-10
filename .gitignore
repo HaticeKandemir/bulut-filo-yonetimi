@@ -32,6 +32,7 @@
 /.nova
 /.phpunit.cache
 /.zed
+/CLAUDE.md
 /auth.json
 /public/fonts-manifest.dev.json
 /storage/pail
