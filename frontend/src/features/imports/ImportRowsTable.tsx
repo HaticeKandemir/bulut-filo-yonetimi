@@ -33,7 +33,7 @@ interface ImportRowsTableProps {
   status: ImportRowStatus | ''
   onStatusChange: (status: string) => void
   selectedRowIds: ReadonlySet<number>
-  onToggleSelect: (rowId: number) => void
+  onToggleSelect: (row: ImportRow) => void
 }
 
 export function ImportRowsTable({
@@ -98,7 +98,7 @@ export function ImportRowsTable({
                       type="checkbox"
                       checked={selectedRowIds.has(row.id)}
                       disabled={!hasRoute}
-                      onChange={() => onToggleSelect(row.id)}
+                      onChange={() => onToggleSelect(row)}
                       title={hasRoute ? undefined : t('imports.map.noRouteHint')}
                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
                     />

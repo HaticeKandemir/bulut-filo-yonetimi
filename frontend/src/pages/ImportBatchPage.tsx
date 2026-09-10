@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { Card } from '../components/Card'
 import { StatusBadge, type BadgeColor } from '../components/StatusBadge'
-import type { ImportBatchStatus } from '../types/api'
+import type { ImportBatchStatus, ImportRow } from '../types/api'
 import { ImportRowsTable } from '../features/imports/ImportRowsTable'
 import { RouteMap } from '../features/imports/RouteMap'
 import { useImportBatch } from '../features/imports/useImportBatch'
@@ -30,34 +30,32 @@ export function ImportBatchPage() {
     isError: rowsError,
   } = useImportBatchRows(batchId, searchParams, batchResponse?.data.status, status !== '')
 
-  const [selectedRowIds, setSelectedRowIds] = useState<Set<number>>(new Set())
+  // Keyed by row id, not just a Set of ids: the table only ever renders one
+  // page of rows, but a selection must survive navigating to other pages
+  // (or changing the status filter) to be compared together on the map, so
+  // the row data itself has to be captured at selection time.
+  const [selectedRows, setSelectedRows] = useState<Map<number, ImportRow>>(new Map())
 
-  const handleStatusChange = (value: string) => {
-    setSelectedRowIds(new Set())
-    setStatus(value)
-  }
-
-  const handlePageChange = (page: number) => {
-    setSelectedRowIds(new Set())
-    setPage(page)
-  }
-
-  const handleToggleSelect = (rowId: number) => {
-    setSelectedRowIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(rowId)) {
-        next.delete(rowId)
+  const handleToggleSelect = (row: ImportRow) => {
+    setSelectedRows((prev) => {
+      const next = new Map(prev)
+      if (next.has(row.id)) {
+        next.delete(row.id)
       } else {
-        next.add(rowId)
+        next.set(row.id, row)
       }
       return next
     })
   }
 
+  const clearSelection = () => setSelectedRows(new Map())
+
+  const selectedRowIds = useMemo(() => new Set(selectedRows.keys()), [selectedRows])
+
   const selectedRoutes = useMemo(
     () =>
-      (rowsResponse?.data ?? [])
-        .filter((row) => selectedRowIds.has(row.id) && row.route !== null && row.start_coordinates !== null && row.end_coordinates !== null)
+      Array.from(selectedRows.values())
+        .filter((row) => row.route !== null && row.start_coordinates !== null && row.end_coordinates !== null)
         .map((row) => ({
           id: row.id,
           label: `${row.plate ?? row.vin ?? ''}`,
@@ -65,7 +63,7 @@ export function ImportBatchPage() {
           start: row.start_coordinates!,
           end: row.end_coordinates!,
         })),
-    [rowsResponse, selectedRowIds],
+    [selectedRows],
   )
 
   return (
@@ -93,9 +91,9 @@ export function ImportBatchPage() {
           <ImportRowsTable
             rows={rowsResponse.data}
             meta={rowsResponse.meta}
-            onPageChange={handlePageChange}
+            onPageChange={setPage}
             status={status}
-            onStatusChange={handleStatusChange}
+            onStatusChange={setStatus}
             selectedRowIds={selectedRowIds}
             onToggleSelect={handleToggleSelect}
           />
@@ -104,7 +102,16 @@ export function ImportBatchPage() {
 
       {selectedRoutes.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900">{t('imports.map.title', { count: selectedRoutes.length })}</h2>
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold text-gray-900">{t('imports.map.title', { count: selectedRoutes.length })}</h2>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              {t('imports.map.clearSelection')}
+            </button>
+          </div>
           <Card className="overflow-hidden p-4">
             <RouteMap routes={selectedRoutes} />
           </Card>
