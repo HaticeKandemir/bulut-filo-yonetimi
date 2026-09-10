@@ -1,10 +1,46 @@
 # Bulut Filo Yönetimi
 
-A fleet management application that imports vehicle and address data from
-user-uploaded Excel files. Addresses are normalised via the OpenAI API,
-converted to coordinates via Google Geocoding, and rendered as routes on a
-map via the Google Routes API. Internship assessment project — single
-developer, one sprint (10 working days).
+**Bulut Filo Yönetimi** is a fleet management application for
+organisations that track vehicles across several institutions,
+departments, or branches. In practice, fleet data like this usually lives
+in someone's Excel sheet — plates, VINs, and addresses typed by hand,
+never mapped to real coordinates or routes, and easy to overwrite by
+accident on the next update. This app turns that spreadsheet into a live,
+queryable fleet: upload the Excel file and the app takes care of the
+rest. Messy, human-typed addresses are normalised by the OpenAI API,
+resolved to coordinates via Google Geocoding, and turned into real
+driving routes via the Google Routes API — all in the background,
+without blocking the upload. A vehicle's identity is its VIN, not its
+plate, so re-importing an updated fleet list correctly detects plate
+transfers and flags genuine conflicts instead of silently overwriting
+data.
+
+On top of that pipeline, the app gives you:
+
+- a searchable, filterable, server-side paginated vehicle list, editable
+  in place (brand, model, institution, plate, fleet status);
+- a live map of where every active vehicle currently starts its route;
+- a **Güzergahlar** screen to select several vehicles and compare their
+  routes — distance and path — on one map;
+- a read-only institution hierarchy (unlimited depth) for organising
+  vehicles by department, branch, or region;
+
+served through a token-authenticated JSON API with server-side caching and
+a fully queued import pipeline (Laravel Horizon), so a large Excel file
+never ties up a web request.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| Login | Dashboard |
+| ![Vehicle list](docs/screenshots/vehicles.png) | ![Vehicle edit](docs/screenshots/vehicle-edit.png) |
+| Vehicle list (server-side filter/sort/paginate) | Vehicle detail — edit brand/model/institution/plate/status |
+| ![Fleet map](docs/screenshots/fleet-map.png) | ![Routes](docs/screenshots/routes.png) |
+| Fleet map — every active vehicle's current start location | Güzergahlar — multi-select routes drawn together on one map |
+| ![Institutions](docs/screenshots/institutions.png) | |
+| Institutions — three independent trees, arbitrary depth | |
 
 ## Tech stack
 
@@ -16,16 +52,19 @@ developer, one sprint (10 working days).
 ## Installation
 
 Requirements: Docker Desktop with Docker Compose v2 and Node.js (CI runs
-Node 26; no `engines` constraint is enforced locally). No local PHP or
-Composer installation is needed for the backend.
+Node 26; no `engines` constraint is enforced locally). PHP and Composer
+run *inside* the containers, so you don't need either installed on your
+host machine for the backend.
 
 ### Backend
 
-1. Make sure `.env` exists at the project root with `APP_URL=http://localhost:8080`
-   and the database/cache values matching the services below (`DB_HOST=mysql`,
-   `DB_DATABASE=bulut_filo_yonetimi`, `REDIS_HOST=redis`), plus real
-   `OPENAI_API_KEY` and `GOOGLE_MAPS_SERVER_KEY` values if you want the
-   address/geocoding/route pipeline to actually resolve anything.
+1. Copy the environment file. The defaults already match the Docker Compose
+   services below and work as-is — you only need to fill in the two API
+   keys (see step 6):
+
+   ```
+   cp .env.example .env
+   ```
 
 2. Build the images and start all services. The `--build` flag is required on
    the first run, otherwise the `horizon` service (which reuses the `app`
@@ -35,19 +74,37 @@ Composer installation is needed for the backend.
    docker compose up -d --build
    ```
 
-3. Generate the application key (writes `APP_KEY` into `.env`):
+3. Install PHP dependencies inside the `app` container. The image only
+   ships the `composer` binary, not `vendor/` — this step has to run
+   after the containers are up:
+
+   ```
+   docker compose exec app composer install
+   ```
+
+4. Generate the application key (writes `APP_KEY` into `.env`):
 
    ```
    docker compose exec app php artisan key:generate
    ```
 
-4. Run migrations and seed the institution hierarchy:
+5. Run migrations and seed the institution hierarchy and demo user:
 
    ```
    docker compose exec app php artisan migrate --seed
    ```
 
-5. Open http://localhost:8080 — the Laravel welcome page should load, and
+6. Get free API keys and add them to `.env` as `OPENAI_API_KEY` and
+   `GOOGLE_MAPS_SERVER_KEY`, then restart the containers
+   (`docker compose restart app horizon`) so they're picked up. Without
+   these, everything works except the import pipeline's address
+   normalisation/geocoding/routing step — uploaded rows will fail there.
+   - OpenAI: [platform.openai.com](https://platform.openai.com) → API keys.
+   - Google: [console.cloud.google.com](https://console.cloud.google.com) →
+     enable the **Geocoding API** and **Routes API**, then create a
+     server-restricted API key.
+
+7. Open http://localhost:8080/up — should return a healthy response, and
    http://localhost:8080/horizon should show the queue dashboard.
 
 ### Frontend
@@ -62,12 +119,18 @@ the Docker Compose stack above.
    npm install
    ```
 
-2. Copy the environment file and set a Google Maps **browser** key (separate
-   from the backend's server key) for the route map to render:
+2. Copy the environment file:
 
    ```
    cp .env.example .env
    ```
+
+   `VITE_API_BASE_URL` already points at the backend from the previous
+   section. Set `VITE_GOOGLE_MAPS_BROWSER_KEY` to a Google Maps API key —
+   this must be a separate, **browser-restricted** key (Maps JavaScript
+   API), not the `GOOGLE_MAPS_SERVER_KEY` from the backend section above,
+   otherwise the map won't render at all. Create one from the same
+   [console.cloud.google.com](https://console.cloud.google.com) project.
 
 3. Start the dev server:
 
