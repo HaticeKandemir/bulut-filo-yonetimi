@@ -11,6 +11,7 @@ use App\Models\ImportRow;
 use App\Models\Institution;
 use App\Models\Vehicle;
 use App\Models\VehiclePlate;
+use App\Services\PlateTransferService;
 use App\Services\VehicleImportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -30,7 +31,7 @@ class VehicleImportDecisionTreeTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new VehicleImportService;
+        $this->service = new VehicleImportService(new PlateTransferService);
         $this->institution = Institution::create(['name' => 'PTT', 'code' => 'PTT']);
         $this->institutionCodeToId = ['PTT' => $this->institution->id];
     }

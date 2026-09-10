@@ -2,18 +2,46 @@
   "app": {
     "title": "Bulut Filo Yönetimi"
   },
+  "auth": {
+    "logout": "Çıkış Yap",
+    "login": {
+      "email": "E-posta",
+      "password": "Şifre",
+      "submit": "Giriş Yap",
+      "submitting": "Giriş yapılıyor...",
+      "errors": {
+        "required": "Bu alan zorunludur.",
+        "invalidCredentials": "E-posta veya şifre hatalı."
+      }
+    }
+  },
   "common": {
     "loading": "Yükleniyor...",
     "error": "Bir hata oluştu.",
     "scrollHint": "Diğer sütunlar için yatayda kaydırın →"
   },
   "home": {
-    "backendStatus": "Backend durumu",
-    "connected": "Bağlandı"
+    "tagline": "Filonuzdaki araçları, güzergahları ve içe aktarımları tek yerden yönetin.",
+    "stats": {
+      "totalVehicles": "Toplam Araç",
+      "activeVehicles": "Aktif Araç",
+      "institutions": "Kurum Sayısı",
+      "latestImport": "Son İçe Aktarım"
+    },
+    "quickLinksTitle": "Hızlı Erişim",
+    "links": {
+      "vehicles": "Araç listesini görüntüle, filtrele ve düzenle",
+      "fleetMap": "Filodaki araçları harita üzerinde gör",
+      "routes": "Güzergahları listele ve haritada karşılaştır",
+      "institutions": "Kurum hiyerarşisini incele",
+      "imports": "Excel dosyası yükle, içe aktarma geçmişini gör"
+    }
   },
   "nav": {
     "home": "Ana Sayfa",
     "vehicles": "Araçlar",
+    "fleetMap": "Harita",
+    "routes": "Güzergahlar",
     "institutions": "Kurumlar",
     "imports": "İçe Aktarımlar"
   },
@@ -42,6 +70,8 @@
     "filters": {
       "vin": "Şasi no ile ara",
       "plate": "Plaka ile ara",
+      "brand": "Marka ile ara",
+      "model": "Model ile ara",
       "allStatuses": "Tüm durumlar",
       "allInstitutions": "Tüm kurumlar"
     },
@@ -60,6 +90,16 @@
         },
         "active": "Aktif",
         "empty": "Plaka geçmişi bulunamadı."
+      },
+      "edit": {
+        "edit": "Düzenle",
+        "save": "Kaydet",
+        "saving": "Kaydediliyor...",
+        "cancel": "İptal",
+        "errors": {
+          "required": "Bu alan zorunludur.",
+          "plateConflict": "Bu plaka şu anda {{vin}} şasi numaralı araçta aktif olarak kullanılıyor."
+        }
       }
     }
   },
@@ -134,11 +174,30 @@
       "title": "Seçili rotalar ({{count}})",
       "start": "Başlangıç",
       "end": "Bitiş",
-      "noRouteHint": "Bu satır için hesaplanmış bir rota yok."
+      "noRouteHint": "Bu satır için hesaplanmış bir rota yok.",
+      "clearSelection": "Seçimi temizle"
     }
   },
   "institutions": {
     "title": "Kurumlar",
     "empty": "Kurum bulunamadı."
+  },
+  "fleetMap": {
+    "title": "Filo Haritası",
+    "empty": "Haritada gösterilecek araç bulunamadı.",
+    "noPlate": "Plaka bilgisi yok"
+  },
+  "routes": {
+    "title": "Güzergahlar",
+    "empty": "Güzergah bulunamadı.",
+    "columns": {
+      "select": "Haritada göstermek için seç",
+      "brandModel": "Marka / Model",
+      "distance": "Mesafe"
+    },
+    "map": {
+      "title": "Seçili güzergahlar ({{count}})",
+      "clearSelection": "Seçimi temizle"
+    }
   }
 }

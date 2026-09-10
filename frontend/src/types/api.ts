@@ -1,3 +1,9 @@
+export interface CurrentUser {
+  id: number
+  name: string
+  email: string
+}
+
 export interface PaginationLink {
   url: string | null
   label: string
@@ -81,7 +87,7 @@ export interface ImportBatch {
   created_at: string
 }
 
-export interface ImportRowRoute {
+export interface RouteSummary {
   distance_meters: number
   duration_seconds: number
   polyline: string
@@ -90,6 +96,28 @@ export interface ImportRowRoute {
 export interface GeoCoordinates {
   lat: number
   lng: number
+}
+
+export interface VehicleMapPin {
+  id: number
+  vin: string
+  brand: string
+  model: string
+  plate: string | null
+  institution: InstitutionSummary
+  start: GeoCoordinates
+}
+
+export interface VehicleRoute {
+  id: number
+  vin: string
+  brand: string
+  model: string
+  plate: string | null
+  institution: InstitutionSummary
+  start: GeoCoordinates
+  end: GeoCoordinates
+  route: RouteSummary
 }
 
 export interface ImportRow {
@@ -112,5 +140,5 @@ export interface ImportRow {
   end_coordinates: GeoCoordinates | null
   route_computation_status: RouteComputationStatus
   route_computation_error: string | null
-  route: ImportRowRoute | null
+  route: RouteSummary | null
 }

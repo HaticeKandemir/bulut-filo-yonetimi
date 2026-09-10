@@ -11,13 +11,16 @@ use App\Exceptions\InvalidImportRowException;
 use App\Exceptions\PlateConflictException;
 use App\Models\ImportRow;
 use App\Models\Vehicle;
-use App\Models\VehiclePlate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 final class VehicleImportService
 {
+    public function __construct(
+        private readonly PlateTransferService $plateTransfer,
+    ) {}
+
     /**
      * Applies the VIN/plate decision tree to a single import row and
      * records the outcome on the row itself. Never throws — all failure
@@ -39,6 +42,14 @@ final class VehicleImportService
                 'status' => ImportRowStatus::Processed,
                 'vehicle_id' => $vehicle->id,
             ]);
+
+            // Denormalized pointer to this vehicle's most recently processed
+            // row, so a vehicle-centric read (fleet map, routes screen) can
+            // reach its current start/end coordinates and route in one join
+            // instead of a "latest row per vehicle" subquery. Rows within a
+            // batch are processed in row_number order, so this is simply
+            // the most recent successful assignment.
+            $vehicle->update(['latest_import_row_id' => $row->id]);
         } catch (PlateConflictException $e) {
             $row->update([
                 'status' => ImportRowStatus::NeedsReview,
@@ -66,9 +77,9 @@ final class VehicleImportService
 
     /**
      * Scenario 1: VIN already exists. Updates the vehicle, reactivates it
-     * (with a log entry) if it wasn't active, and — if the plate changed —
-     * closes the old assignment and opens the new one, running the same
-     * conflict check used for brand-new VINs.
+     * (with a log entry) if it wasn't active, and transfers the plate via
+     * PlateTransferService if it changed (running the same conflict check
+     * used for brand-new VINs).
      */
     private function updateExistingVehicle(Vehicle $vehicle, int $institutionId, VehicleImportRowData $data): Vehicle
     {
@@ -89,35 +100,19 @@ final class VehicleImportService
             ]);
         }
 
-        $currentPlate = $vehicle->activePlate;
-
-        if ($currentPlate === null || $currentPlate->plate !== $data->plate) {
-            $transferablePlate = $this->findTransferablePlate($data->plate, excludingVehicleId: $vehicle->id);
-
-            if ($currentPlate !== null) {
-                $this->closePlate($currentPlate);
-            }
-
-            if ($transferablePlate !== null) {
-                $this->closePlate($transferablePlate);
-            }
-
-            $this->openPlate($vehicle, $data->plate);
-        }
+        $this->plateTransfer->transferPlate($vehicle, $data->plate);
 
         return $vehicle;
     }
 
     /**
      * Scenarios 2/3/4: VIN is new. The plate's current active holder (if
-     * any) decides the branch inside findTransferablePlate() — Passive/
+     * any) decides the branch inside PlateTransferService — Passive/
      * LeftFleet means transfer (2), Active means PlateConflictException (3),
      * not found means the plate is free (4).
      */
     private function createVehicleWithPlate(int $institutionId, VehicleImportRowData $data): Vehicle
     {
-        $transferablePlate = $this->findTransferablePlate($data->plate, excludingVehicleId: null);
-
         $vehicle = Vehicle::create([
             'vin' => $data->vin,
             'brand' => $data->brand,
@@ -126,51 +121,8 @@ final class VehicleImportService
             'status' => VehicleStatus::Active,
         ]);
 
-        if ($transferablePlate !== null) {
-            $this->closePlate($transferablePlate);
-        }
-
-        $this->openPlate($vehicle, $data->plate);
+        $this->plateTransfer->transferPlate($vehicle, $data->plate);
 
         return $vehicle;
-    }
-
-    /**
-     * Finds $plate's current active assignment. Returns null when the
-     * plate is free, or already held by $excludingVehicleId (no-op case).
-     *
-     * @throws PlateConflictException when the current holder is Active.
-     */
-    private function findTransferablePlate(string $plate, ?int $excludingVehicleId): ?VehiclePlate
-    {
-        $activePlate = VehiclePlate::where('plate', $plate)
-            ->where('released_at', VehiclePlate::ACTIVE_SENTINEL)
-            ->lockForUpdate()
-            ->first();
-
-        if ($activePlate === null || $activePlate->vehicle_id === $excludingVehicleId) {
-            return null;
-        }
-
-        if ($activePlate->vehicle->status === VehicleStatus::Active) {
-            throw PlateConflictException::forPlate($plate, $activePlate->vehicle);
-        }
-
-        return $activePlate;
-    }
-
-    private function closePlate(VehiclePlate $plate): void
-    {
-        $plate->released_at = now();
-        $plate->save();
-    }
-
-    private function openPlate(Vehicle $vehicle, string $plate): void
-    {
-        VehiclePlate::create([
-            'vehicle_id' => $vehicle->id,
-            'plate' => $plate,
-            'assigned_at' => now(),
-        ]);
     }
 }

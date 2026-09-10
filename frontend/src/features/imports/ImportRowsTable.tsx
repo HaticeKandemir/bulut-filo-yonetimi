@@ -3,6 +3,7 @@ import { Pagination } from '../../components/Pagination'
 import { ScrollHint } from '../../components/ScrollHint'
 import { StatusBadge, type BadgeColor } from '../../components/StatusBadge'
 import type { AddressResolutionStatus, ImportRow, ImportRowStatus, PaginationMeta, RouteComputationStatus } from '../../types/api'
+import { formatRouteSummary } from '../../utils/route'
 
 const ROW_STATUS_COLORS: Record<ImportRowStatus, BadgeColor> = {
   pending: 'gray',
@@ -33,13 +34,6 @@ interface ImportRowsTableProps {
   onStatusChange: (status: string) => void
   selectedRowIds: ReadonlySet<number>
   onToggleSelect: (rowId: number) => void
-}
-
-function formatRouteSummary(route: NonNullable<ImportRow['route']>): string {
-  const km = (route.distance_meters / 1000).toFixed(1)
-  const minutes = Math.round(route.duration_seconds / 60)
-
-  return `${km} km, ${minutes} dk`
 }
 
 export function ImportRowsTable({

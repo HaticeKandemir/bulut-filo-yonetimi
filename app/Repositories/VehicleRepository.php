@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Enums\RouteComputationStatus;
+use App\Enums\VehicleStatus;
+use App\Http\Resources\VehicleMapPinResource;
 use App\Http\Resources\VehicleResource;
+use App\Http\Resources\VehicleRouteResource;
 use App\Models\Vehicle;
 use App\Services\InstitutionTreeService;
 use Illuminate\Database\Eloquent\Builder;
@@ -42,7 +46,7 @@ final class VehicleRepository
     public function paginate(Request $request, int $perPage): array
     {
         return Cache::tags([Vehicle::CACHE_TAG])->remember(
-            $this->cacheKey($request, $perPage),
+            $this->cacheKey('vehicles:index:', $request, $perPage),
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             fn () => VehicleResource::collection(
                 $this->query($request)->paginate($perPage)->withQueryString(),
@@ -59,6 +63,56 @@ final class VehicleRepository
             "vehicles:show:{$vehicle->id}",
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             fn () => (new VehicleResource($vehicle->load(['institution', 'activePlate', 'plates'])))->response()->getData(true),
+        );
+    }
+
+    /**
+     * Active vehicles whose most recently processed import row resolved a
+     * start address — one pin per vehicle for the fleet map.
+     *
+     * @return array<string, mixed>
+     */
+    public function forMap(): array
+    {
+        return Cache::tags([Vehicle::CACHE_TAG])->remember(
+            'vehicles:map',
+            now()->addMinutes(self::CACHE_TTL_MINUTES),
+            fn () => VehicleMapPinResource::collection(
+                Vehicle::query()
+                    ->where('status', VehicleStatus::Active)
+                    ->whereHas('latestImportRow', fn (Builder $query) => $query->whereNotNull('start_geocoded_address_id'))
+                    ->with(['institution', 'activePlate', 'latestImportRow.startGeocodedAddress'])
+                    ->get(),
+            )->response()->getData(true),
+        );
+    }
+
+    /**
+     * Active vehicles whose most recently processed import row has a
+     * computed route — paginated/filterable/sortable the same way as the
+     * main vehicle list, for the fleet-wide "Güzergahlar" screen.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws InvalidFilterQuery
+     * @throws InvalidSortQuery
+     */
+    public function forRoutes(Request $request, int $perPage): array
+    {
+        return Cache::tags([Vehicle::CACHE_TAG])->remember(
+            $this->cacheKey('vehicles:routes:', $request, $perPage),
+            now()->addMinutes(self::CACHE_TTL_MINUTES),
+            fn () => VehicleRouteResource::collection(
+                $this->query($request)
+                    ->where('status', VehicleStatus::Active)
+                    ->whereHas(
+                        'latestImportRow',
+                        fn (Builder $query) => $query->where('route_computation_status', RouteComputationStatus::Computed),
+                    )
+                    ->with(['latestImportRow.startGeocodedAddress', 'latestImportRow.endGeocodedAddress', 'latestImportRow.route'])
+                    ->paginate($perPage)
+                    ->withQueryString(),
+            )->response()->getData(true),
         );
     }
 
@@ -135,12 +189,12 @@ final class VehicleRepository
         };
     }
 
-    private function cacheKey(Request $request, int $perPage): string
+    private function cacheKey(string $prefix, Request $request, int $perPage): string
     {
         $params = $request->only(['filter', 'sort', 'page']);
         $params['per_page'] = $perPage;
         ksort($params);
 
-        return 'vehicles:index:'.md5(http_build_query($params));
+        return $prefix.md5(http_build_query($params));
     }
 }

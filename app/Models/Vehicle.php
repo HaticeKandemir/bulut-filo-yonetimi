@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['vin', 'brand', 'model', 'institution_id', 'status'])]
+#[Fillable(['vin', 'brand', 'model', 'institution_id', 'status', 'latest_import_row_id'])]
 #[ObservedBy(VehicleObserver::class)]
 class Vehicle extends Model
 {
@@ -56,5 +56,18 @@ class Vehicle extends Model
     {
         return $this->hasOne(VehiclePlate::class)
             ->where('released_at', VehiclePlate::ACTIVE_SENTINEL);
+    }
+
+    /**
+     * The most recently successfully processed import row for this vehicle
+     * — its start/end coordinates and route (via the row's own relations)
+     * stand in for the vehicle's "current" location, without a separate
+     * "latest row per vehicle" query.
+     *
+     * @return BelongsTo<ImportRow, $this>
+     */
+    public function latestImportRow(): BelongsTo
+    {
+        return $this->belongsTo(ImportRow::class);
     }
 }

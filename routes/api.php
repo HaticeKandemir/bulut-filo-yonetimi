@@ -13,6 +13,9 @@ Route::get('vehicle-imports/{importBatch}', [VehicleImportController::class, 'sh
 Route::get('vehicle-imports/{importBatch}/rows', [VehicleImportController::class, 'rows']);
 
 Route::get('vehicles', [VehicleController::class, 'index']);
+Route::get('vehicles/map', [VehicleController::class, 'mapPins']);
+Route::get('vehicles/routes', [VehicleController::class, 'routes']);
 Route::get('vehicles/{vehicle}', [VehicleController::class, 'show']);
+Route::patch('vehicles/{vehicle}', [VehicleController::class, 'update']);
 
 Route::get('institutions', [InstitutionController::class, 'index']);

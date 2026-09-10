@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { Card } from '../components/Card'
 import { StatusBadge, type BadgeColor } from '../components/StatusBadge'
 import type { VehicleStatus } from '../types/api'
+import { VehicleEditForm } from '../features/vehicles/VehicleEditForm'
+import { useInstitutions } from '../hooks/useInstitutions'
 import { useVehicle } from '../features/vehicles/useVehicle'
 
 const STATUS_COLORS: Record<VehicleStatus, BadgeColor> = {
@@ -15,8 +18,10 @@ export function VehicleDetailPage() {
   const { t } = useTranslation()
   const params = useParams<{ id: string }>()
   const vehicleId = Number(params.id)
+  const [isEditing, setIsEditing] = useState(false)
 
   const { data, isPending, isError } = useVehicle(vehicleId)
+  const { data: institutions } = useInstitutions()
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -29,33 +34,53 @@ export function VehicleDetailPage() {
 
       {data && (
         <>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
-            {data.data.brand} {data.data.model}
-          </h1>
+          <div className="mt-2 flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+              {data.data.brand} {data.data.model}
+            </h1>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              >
+                {t('vehicles.detail.edit.edit')}
+              </button>
+            )}
+          </div>
 
           <Card className="mt-4 p-6">
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-4">
-              <div>
-                <dt className="text-gray-500">{t('vehicles.columns.vin')}</dt>
-                <dd className="mt-1 font-medium text-gray-900">{data.data.vin}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('vehicles.columns.status')}</dt>
-                <dd className="mt-1">
-                  <StatusBadge color={STATUS_COLORS[data.data.status]}>{t(`vehicles.status.${data.data.status}`)}</StatusBadge>
-                </dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('vehicles.columns.institution')}</dt>
-                <dd className="mt-1 font-medium text-gray-900">{data.data.institution.name}</dd>
-              </div>
-              <div>
-                <dt className="text-gray-500">{t('vehicles.detail.activePlate')}</dt>
-                <dd className="mt-1 font-medium text-gray-900">
-                  {data.data.active_plate?.plate ?? t('vehicles.detail.noActivePlate')}
-                </dd>
-              </div>
-            </dl>
+            {isEditing ? (
+              <VehicleEditForm
+                vehicle={data.data}
+                institutions={institutions ?? []}
+                onCancel={() => setIsEditing(false)}
+                onSaved={() => setIsEditing(false)}
+              />
+            ) : (
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-4">
+                <div>
+                  <dt className="text-gray-500">{t('vehicles.columns.vin')}</dt>
+                  <dd className="mt-1 font-medium text-gray-900">{data.data.vin}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('vehicles.columns.status')}</dt>
+                  <dd className="mt-1">
+                    <StatusBadge color={STATUS_COLORS[data.data.status]}>{t(`vehicles.status.${data.data.status}`)}</StatusBadge>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('vehicles.columns.institution')}</dt>
+                  <dd className="mt-1 font-medium text-gray-900">{data.data.institution.name}</dd>
+                </div>
+                <div>
+                  <dt className="text-gray-500">{t('vehicles.detail.activePlate')}</dt>
+                  <dd className="mt-1 font-medium text-gray-900">
+                    {data.data.active_plate?.plate ?? t('vehicles.detail.noActivePlate')}
+                  </dd>
+                </div>
+              </dl>
+            )}
           </Card>
 
           <h2 className="mt-8 mb-2 text-lg font-semibold text-gray-900">{t('vehicles.detail.plateHistory.title')}</h2>
