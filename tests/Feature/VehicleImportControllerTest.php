@@ -7,12 +7,20 @@ namespace Tests\Feature;
 use App\Enums\ImportBatchStatus;
 use App\Enums\ImportRowStatus;
 use App\Models\ImportBatch;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class VehicleImportControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create(), 'sanctum');
+    }
 
     public function test_index_returns_batches_ordered_newest_first(): void
     {

@@ -14,7 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // API-only app: there's no "login" named route to redirect guests
+        // to (the framework default). Without this, an unauthenticated
+        // request that doesn't send Accept: application/json crashes with
+        // a 500 (RouteNotFoundException) instead of a clean 401.
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

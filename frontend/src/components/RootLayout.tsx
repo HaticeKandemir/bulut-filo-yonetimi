@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router'
+import { useCurrentUser } from '../features/auth/useCurrentUser'
+import { useLogout } from '../features/auth/useLogout'
 
 const linkClassName = ({ isActive }: { isActive: boolean }) =>
   `whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium transition-colors sm:px-3 ${
@@ -8,6 +10,8 @@ const linkClassName = ({ isActive }: { isActive: boolean }) =>
 
 export function RootLayout() {
   const { t } = useTranslation()
+  const { data: currentUser } = useCurrentUser()
+  const logout = useLogout()
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -21,6 +25,12 @@ export function RootLayout() {
             <NavLink to="/vehicles" className={linkClassName}>
               {t('nav.vehicles')}
             </NavLink>
+            <NavLink to="/fleet-map" className={linkClassName}>
+              {t('nav.fleetMap')}
+            </NavLink>
+            <NavLink to="/routes" className={linkClassName}>
+              {t('nav.routes')}
+            </NavLink>
             <NavLink to="/institutions" className={linkClassName}>
               {t('nav.institutions')}
             </NavLink>
@@ -28,6 +38,16 @@ export function RootLayout() {
               {t('nav.imports')}
             </NavLink>
           </nav>
+          <div className="ml-auto flex items-center gap-3">
+            {currentUser && <span className="hidden text-sm text-gray-500 sm:inline">{currentUser.data.name}</span>}
+            <button
+              type="button"
+              onClick={() => logout.mutate()}
+              className="whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 sm:px-3"
+            >
+              {t('auth.logout')}
+            </button>
+          </div>
         </div>
       </header>
       <Outlet />
